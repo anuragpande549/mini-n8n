@@ -8,15 +8,35 @@
 
 This documentation is organized into multiple files for clarity. Navigate to the chapter that best matches your interest:
 
+### Front Matter
+
+| # | File | Description |
+|---|------|-------------|
+| 01 | [01-title-page.md](./01-title-page.md) | Title page with institution and student details |
+| 02 | [02-declaration.md](./02-declaration.md) | Student declaration of originality |
+| 03 | [03-certificate-guide.md](./03-certificate-guide.md) | Certificate from project guide |
+| 04 | [04-certificate-company.md](./04-certificate-company.md) | Certificate from company (if applicable) |
+| 05 | [05-approval-certificate.md](./05-approval-certificate.md) | Examiner approval certificate |
+| 06 | [06-acknowledgement.md](./06-acknowledgement.md) | Acknowledgements |
+| 07 | [07-table-of-contents.md](./07-table-of-contents.md) | Full table of contents |
+| 08 | [08-list-of-figures.md](./08-list-of-figures.md) | List of all figures |
+| 09 | [09-list-of-tables.md](./09-list-of-tables.md) | List of all tables |
+| 10 | [10-list-of-algorithms.md](./10-list-of-algorithms.md) | List of all algorithms |
+| 11 | [11-abstract.md](./11-abstract.md) | Project abstract |
+
+### Chapters
+
 | Chapter | File | Description |
 |---------|------|-------------|
-| 1. Introduction | [01-introduction.md](./01-introduction.md) | Background, purpose, scope, and objectives |
-| 2. Project Planning | [02-project-planning.md](./02-project-planning.md) | Plan, WBS, Gantt, PERT, team, methodology, requirements |
-| 3. System Analysis | [03-system-analysis.md](./03-system-analysis.md) | Problem definition, requirements, DFD, use case, DB schema |
-| 4. System Design | [04-system-design.md](./04-system-design.md) | Architecture, ER diagram, class diagram, I/O design |
-| 5. Implementation | [05-implementation.md](./05-implementation.md) | Source code walkthrough, module integration, screenshots |
-| 6. System Testing | [06-system-testing.md](./06-system-testing.md) | Unit, integration, system, acceptance testing |
-| 7. Conclusion | [07-conclusion.md](./07-conclusion.md) | Results, limitations, future work, lessons learned |
+| 1. Introduction | [chapter-1-introduction.md](./chapter-1-introduction.md) | Background, purpose, scope, and objectives |
+| 2. Project Planning | [chapter-2-planning-scheduling.md](./chapter-2-planning-scheduling.md) | Plan, WBS, Gantt, PERT, team, methodology, requirements |
+| 3. System Analysis | [chapter-3-system-analysis.md](./chapter-3-system-analysis.md) | Problem definition, requirements, DFD, use case, DB schema |
+| 4. System Design | [chapter-4-system-design.md](./chapter-4-system-design.md) | Architecture, ER diagram, class diagram, I/O design |
+| 5. Implementation | [chapter-5-implementation.md](./chapter-5-implementation.md) | Source code walkthrough, module integration, screenshots |
+| 6. System Testing | [chapter-6-system-testing.md](./chapter-6-system-testing.md) | Unit, integration, system, acceptance testing |
+| 7. Conclusion | [chapter-7-conclusion.md](./chapter-7-conclusion.md) | Results, limitations, future work, lessons learned |
+| — | [references.md](./references.md) | IEEE-formatted references |
+| — | [appendices.md](./appendices.md) | Appendices A–G |
 
 ---
 
