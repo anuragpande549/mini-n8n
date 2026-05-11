@@ -80,31 +80,43 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans">
       {/* Top Navbar */}
-      <nav className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/70 dark:bg-gray-900/70 border-b border-gray-200 dark:border-gray-800">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-2 rounded-lg">
-              <LayoutDashboard className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-              AgentFlow
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={() => {
-                useWorkflowStore.getState().clearWorkflow();
-                router.push("/editor");
-              }}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Agent
-            </Button>
-            <UserButton afterSignOutUrl="/" />
-          </div>
-        </div>
-      </nav>
+{/* Top Navbar */}
+<nav className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/70 dark:bg-gray-900/70 border-b border-gray-200 dark:border-gray-800">
+  <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+    <div className="flex items-center gap-2">
+      <div className="bg-indigo-600 p-2 rounded-lg">
+        <LayoutDashboard className="w-5 h-5 text-white" />
+      </div>
+
+      <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+        AgentFlow
+      </span>
+    </div>
+
+    <div className="flex items-center gap-4">
+      <Button
+        onClick={() => {
+          useWorkflowStore.getState().clearWorkflow();
+          router.push("/editor");
+        }}
+        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5"
+      >
+        <Plus className="w-4 h-4 mr-2" />
+        Create Agent
+      </Button>
+
+      <UserButton>
+        <UserButton.MenuItems>
+          <UserButton.Action
+            label="Home"
+            labelIcon={<LayoutDashboard className="w-4 h-4" />}
+            onClick={() => router.push("/")}
+          />
+        </UserButton.MenuItems>
+      </UserButton>
+    </div>
+  </div>
+</nav>
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-10">
@@ -193,15 +205,14 @@ export default function DashboardPage() {
                     <span className="text-xs text-gray-400 font-medium">
                       {new Date(task.updatedAt).toLocaleDateString()}
                     </span>
-                    <Button
-                      onClick={() => handleLoadWorkflow(task)}
-                      size="sm"
-                      variant="secondary"
-                      className="rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 dark:text-indigo-300 transition-colors"
-                    >
-                      <Edit className="w-3.5 h-3.5 mr-1.5" />
-                      Edit Agent
-                    </Button>
+<Button
+  onClick={() => handleLoadWorkflow(task)}
+  size="sm"
+  className="rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 dark:text-indigo-300 transition-colors"
+>
+  <Edit className="w-3.5 h-3.5 mr-1.5" />
+  Edit Agent
+</Button>
                   </div>
                 </div>
               </div>

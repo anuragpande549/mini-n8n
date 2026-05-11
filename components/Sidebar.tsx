@@ -149,7 +149,7 @@ export default function Sidebar({
             )}
 
             {isLoaded && isSignedIn && (
-              <UserButton afterSignOutUrl="/" />
+              <UserButton  />
             )}
           </div>
 

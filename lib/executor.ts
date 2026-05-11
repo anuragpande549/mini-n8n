@@ -453,15 +453,18 @@ export class WorkflowExecutor {
       let data = replaceTemplateVariables(dataSource, input);
       let parsedName = replaceTemplateVariables(fileName || "export.xlsx", input);
 
-      if (typeof data === "string") {
-        try { 
-          data = JSON.parse(data); 
-        } catch { 
-          // If it's a comma separated string
-          if (data.includes(",")) data = data.split(",").map(i => i.trim());
-          else data = [data]; 
-        }
-      }
+if (typeof data === "string") {
+  try {
+    data = JSON.parse(data);
+  } catch {
+    // If it's a comma separated string
+    if (data.includes(",")) {
+      data = data.split(",").map((i: string) => i.trim());
+    } else {
+      data = [data];
+    }
+  }
+}
       
       if (!Array.isArray(data)) {
         data = [data];
@@ -476,34 +479,41 @@ export class WorkflowExecutor {
 
       // Apply column mapping if provided
       if (columnMapping && typeof columnMapping === "string" && columnMapping.trim() !== "") {
-        try {
-          const mapping = JSON.parse(columnMapping);
-          data = data.map(item => {
-            const mappedItem: any = {};
-            for (const [colName, path] of Object.entries(mapping)) {
-              let val = item;
-              if (typeof path === "string") {
-                const parts = path.split(".");
-                for (const p of parts) {
-                  if (val && typeof val === "object") {
-                    val = val[p];
-                  } else {
-                    val = undefined;
-                    break;
-                  }
-                }
-              }
-              mappedItem[colName] = val !== undefined ? val : ""; // Use empty string for missing values
+  try {
+    const mapping = JSON.parse(columnMapping);
+
+    data = data.map((item: any) => {
+      const mappedItem: any = {};
+
+      for (const [colName, path] of Object.entries(mapping as Record<string, any>)) {
+        let val: any = item;
+
+        if (typeof path === "string") {
+          const parts = path.split(".");
+
+          for (const p of parts) {
+            if (val && typeof val === "object") {
+              val = val[p];
+            } else {
+              val = undefined;
+              break;
             }
-            return mappedItem;
-          });
-        } catch (e: any) {
-          return {
-            success: false,
-            error: "Invalid JSON in Column Mapping: " + e.message,
-          };
+          }
         }
+
+        mappedItem[colName] = val !== undefined ? val : "";
       }
+
+      return mappedItem;
+    });
+
+  } catch (e: any) {
+    return {
+      success: false,
+      error: "Invalid JSON in Column Mapping: " + e.message,
+    };
+  }
+}
 
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
