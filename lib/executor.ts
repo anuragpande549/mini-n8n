@@ -226,16 +226,36 @@ export class WorkflowExecutor {
     }
   }
 
-  private async executeAINodeType(
-    config: Record<string, any>,
-    input: any
-  ): Promise<NodeExecutionResult> {
-    const result = await this.executeAINode(config.type, config, input);
-    return {
-      success: true,
-      output: typeof input === 'object' ? { ...input, ...result } : result,
-    };
+private async executeAINodeType(
+  config: Record<string, any>,
+  input: any
+): Promise<NodeExecutionResult> {
+
+  // ✅ Resolve placeholders in ALL config fields
+  const resolvedConfig: Record<string, any> = {};
+
+  for (const key in config) {
+    resolvedConfig[key] = replaceTemplateVariables(
+      config[key],
+      input
+    );
   }
+
+  // ✅ Execute AI node with resolved config
+  const result = await this.executeAINode(
+    resolvedConfig.type,
+    resolvedConfig,
+    input
+  );
+
+  return {
+    success: true,
+    output:
+      typeof input === "object"
+        ? { ...input, ...result }
+        : result,
+  };
+}
 
   private async executeActionNode(
     config: Record<string, any>,
@@ -559,44 +579,140 @@ if (typeof data === "string") {
     }
   }
 
-  private executeIfElse(
-    config: Record<string, any>,
-    input: any
-  ): NodeExecutionResult {
-    try {
-      const { condition, operator } = config;
+private executeIfElse(
+  config: Record<string, any>,
+  input: any
+): NodeExecutionResult {
+  try {
+    const { condition, operator } = config;
 
-      let result = false;
+    let result = false;
 
-      if (operator === "javascript") {
-        const evaluateFunction = new Function("input", `return ${condition}`);
-        result = Boolean(evaluateFunction(input));
-      } else {
-        const processedCondition = replaceTemplateVariables(String(condition), input);
-        const inputString = typeof input === "object" ? JSON.stringify(input) : String(input);
+    if (operator === "javascript") {
+      const evaluateFunction = new Function(
+        "input",
+        `return ${condition}`
+      );
 
-        if (operator === "equals") {
-          result = inputString === processedCondition;
-        } else if (operator === "contains") {
-          result = inputString.includes(processedCondition);
+      result = Boolean(evaluateFunction(input));
+    } else {
+      const processedCondition = replaceTemplateVariables(
+        String(condition),
+        input
+      );
+
+      const inputString =
+        typeof input === "object"
+          ? JSON.stringify(input)
+          : String(input);
+
+      if (operator === "equals") {
+        result = inputString === processedCondition;
+      } else if (operator === "contains") {
+        result = inputString.includes(processedCondition);
+      }
+    }
+
+    // ✅ FIXED VERSION
+    // Preserve original input structure
+    // Avoid nested input.input.input...
+
+    return {
+      success: true,
+      output: {
+        ...(typeof input === "object" ? input : { value: input }),
+        condition: result,
+        branch: result ? "true" : "false",
+      },
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Condition evaluation failed",
+    };
+  }
+}
+
+private executeLoop(
+  config: Record<string, any>,
+  input: any
+): NodeExecutionResult {
+  try {
+    const { arraySource } = config;
+
+    // ✅ Resolve placeholders FIRST
+    let processedArray = replaceTemplateVariables(
+      arraySource,
+      input
+    );
+
+    let items: any[] = [];
+
+    // ✅ Handle arrays directly
+    if (Array.isArray(processedArray)) {
+      items = processedArray;
+    }
+
+    // ✅ Handle JSON strings
+    else if (typeof processedArray === "string") {
+      try {
+        const parsed = JSON.parse(processedArray);
+
+        if (Array.isArray(parsed)) {
+          items = parsed;
+        } else {
+          items = [parsed];
+        }
+      } catch {
+        // comma separated fallback
+        if (processedArray.includes(",")) {
+          items = processedArray
+            .split(",")
+            .map((i) => i.trim());
+        } else {
+          items = [processedArray];
         }
       }
-
-      return {
-        success: true,
-        output: {
-          condition: result,
-          branch: result ? "true" : "false",
-          input,
-        },
-      };
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.message || "Condition evaluation failed",
-      };
     }
+
+    // ✅ Handle single object
+    else if (
+      processedArray &&
+      typeof processedArray === "object"
+    ) {
+      items = [processedArray];
+    }
+
+    // fallback
+    else {
+      items = [];
+    }
+
+    // ✅ IMPORTANT FIX
+    // Return FIRST ITEM directly for downstream nodes
+    // instead of returning {items:[...]}
+
+    const currentItem =
+      items.length > 0 ? items[0] : null;
+
+    return {
+      success: true,
+      output: {
+        ...(typeof currentItem === "object"
+          ? currentItem
+          : { value: currentItem }),
+
+        loopIndex: 0,
+        totalItems: items.length,
+      },
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Failed to process loop array",
+    };
   }
+}
 
   private async executeDelay(
     config: Record<string, any>,
@@ -617,53 +733,5 @@ if (typeof data === "string") {
     };
   }
 
-  private executeLoop(
-    config: Record<string, any>,
-    input: any
-  ): NodeExecutionResult {
-    try {
-      const { arraySource } = config;
-      
-      // Process template variables to get the array string
-      let processedArray = replaceTemplateVariables(arraySource, input);
-      
-      let items: any[] = [];
-      
-      if (typeof processedArray === "string") {
-        try {
-          items = JSON.parse(processedArray);
-        } catch (e) {
-          // If it's not a JSON string but a comma separated string, try to split it
-          if (processedArray.includes(",")) {
-            items = processedArray.split(",").map(i => i.trim());
-          } else {
-            // Otherwise, treat the entire string as a single item
-            items = [processedArray];
-          }
-        }
-      } else if (Array.isArray(processedArray)) {
-        items = processedArray;
-      } else {
-        items = [processedArray];
-      }
 
-      if (!Array.isArray(items)) {
-        items = [items];
-      }
-
-      return {
-        success: true,
-        output: {
-          items,
-          totalItems: items.length,
-          originalInput: input
-        },
-      };
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.message || "Failed to process loop array",
-      };
-    }
-  }
 }
