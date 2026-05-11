@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String      @id @default(uuid())
+  clerkId   String      @unique
+  email     String      @unique
+  name      String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  tasks     AgentTask[]
+}
+
+model AgentTask {
+  id           String   @id @default(uuid())
+  name         String
+  description  String?
+  workflowData Json
+  userId       String
+  user         User     @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
